@@ -1,0 +1,489 @@
+openapi: 3.0.3
+info:
+  title: Transport management capability
+  version: 'v1'
+paths:
+  /consignments:
+    post:
+      description: Create a new Consignment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/consignmentRequest'
+        required: true
+      responses:
+        '201':
+          description: The created consignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/consignmentResponse'
+components:
+  schemas:
+    consignmentPart:
+      type: object
+      required: [role,address]
+      properties:
+        role:
+          enum:
+            - Unknown
+            - Consignor
+            - Consignee
+          type: integer
+          default: Unknown
+        address:
+          $ref: '#/components/schemas/partAddress'
+        communication:
+          $ref: '#/components/schemas/partCommunication'
+        reference:
+          $ref: '#/components/schemas/partReference'
+    consignmentRequest:
+      type: object
+      required: [customerId,orderNumber,templateName,consignee,goodsItems]
+      properties:
+        customerId:
+          type: string
+          description: The ID of the Logent customer. Used for routing to correct nShift instance.
+        orderNumber:
+          type: string
+          description: Order number, which is is idempotent, so that multiple requests with the same number yields the same response, and does not create a new consignment if it is already created.
+        templateName:
+          type: string
+          description: The template to use. Contains consignor and other things.
+        consignee:
+          $ref: '#/components/schemas/consignmentPart'
+        goodsItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/goodsItem'
+        consignmentReferences:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              type:
+                type: integer
+                description: Length 1..35
+              value:
+                type: string
+                description: Length 1..35
+          example: { "type1": "value1" }
+        notes:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              type:
+                type: integer
+                description: Length 1..3
+              value:
+                type: string
+          example: { "type1": "note1" }
+    consignmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the consignment
+        consignmentNumber:
+          type: string
+          description: The consignment number from the Carrier
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/consignmentPart'
+        goodsItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/goodsItem'
+        consignmentReferences:
+          type: object
+          additionalProperties:
+            type: string
+        notes:
+          type: object
+          additionalProperties:
+            type: string
+        transportProduct:
+          $ref: '#/components/schemas/consignmentTransportProduct'
+    consignmentTransportProduct:
+      type: object
+      properties:
+        paymentInstruction:
+          type: string
+        additionalServices:
+          type: array
+          items:
+            $ref: '#/components/schemas/transportAdditionalService'
+        advice:
+          type: boolean
+          nullable: true
+        termsOfDelivery:
+          $ref: '#/components/schemas/transportTermsOfDelivery'
+        cashOnDelivery:
+          $ref: '#/components/schemas/transportCashOnDelivery'
+        pickup:
+          $ref: '#/components/schemas/transportPickup'
+        delivery:
+          $ref: '#/components/schemas/transportDelivery'
+        transport:
+          $ref: '#/components/schemas/transportTransport'
+        customsClearances:
+          type: array
+          items:
+            $ref: '#/components/schemas/transportCustomsClearance'
+        sortCode:
+          $ref: '#/components/schemas/transportSortCode'
+        insurance:
+          $ref: '#/components/schemas/transportInsurance'
+        serviceOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/transportServiceOption'
+    dangerousGoods:
+      type: object
+      properties:
+        unNo:
+          type: string
+        adrClass:
+          type: string
+        packGroup:
+          type: string
+        weight:
+          type: number
+          format: float
+          nullable: true
+        netWeight:
+          type: number
+          format: float
+          nullable: true
+        netWeightExplSub:
+          type: string
+        noOfPackages:
+          type: integer
+          nullable: true
+        packageType:
+          type: string
+        mp:
+          type: string
+        flamePoint:
+          type: string
+        lq:
+          type: string
+        category:
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+          type: integer
+          default: 0
+          nullable: true
+        ems:
+          type: string
+        sp:
+          type: string
+        tunnelRestrictionCode:
+          type: string
+        description:
+          type: array
+          items:
+            type: string
+    goodsItem:
+      type: object
+      required: [noOfPackages,weight, packageType]
+      properties:
+        noOfPackages:
+          type: integer
+        weight:
+          type: number
+          format: float
+        packageType:
+          type: string
+        weightUnit:
+          type: string
+        volume:
+          type: number
+          format: float
+          nullable: true
+        volumeUnit:
+          type: string
+        length:
+          type: number
+          format: float
+          nullable: true
+        lengthUnit:
+          type: string
+        width:
+          type: number
+          format: float
+          nullable: true
+        height:
+          type: number
+          format: float
+          nullable: true
+        loadingMetres:
+          type: number
+          format: float
+          nullable: true
+        palletSpace:
+          type: integer
+          nullable: true
+        tag:
+          type: string
+        goodsType:
+          type: string
+        netWeight:
+          type: number
+          format: float
+          nullable: true
+        stackable:
+          type: boolean
+          nullable: true
+        notes:
+          type: string
+        packageIds:
+          type: array
+          items:
+            type: string
+        dangerousGoods:
+          $ref: '#/components/schemas/dangerousGoods'
+    partAddress:
+      type: object
+      required: ['id','name','addressLine1','postalCode','city','countryCode']
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        addressLine1:
+          type: string
+        addressLine2:
+          type: string
+        addressLine3:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        countryCode:
+          type: string
+          description: ISO3166 (SE, DK, etc)
+          minLength: 2
+          maxLength: 2
+    partCommunication:
+      type: object
+      properties:
+        contactPerson:
+          type: string
+        phone:
+          type: string
+        mobile:
+          type: string
+        mobileNotification:
+          type: boolean
+        fax:
+          type: string
+        email:
+          type: string
+        emailNotification:
+          type: boolean
+        bankgiro:
+          type: string
+    partReference:
+      type: object
+      properties:
+        customerNo:
+          type: string
+        reference:
+          type: string
+        accountNo:
+          type: string
+        eanCustomerNo:
+          type: string
+        palletRegNo:
+          type: string
+        vatNo:
+          type: string
+        eoriNo:
+          type: string
+    transportAdditionalService:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    transportCashOnDelivery:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        paymentMethod:
+          type: string
+        accountNo:
+          type: string
+        reference:
+          type: string
+    transportCustomsClearance:
+      type: object
+      properties:
+        duitable:
+          type: boolean
+          nullable: true
+        customsDeclarationNo:
+          type: string
+        customsDescription:
+          type: string
+        customsReference:
+          type: string
+        countryOfOrigin:
+          type: string
+        invoiceNo:
+          type: string
+        invoiceDate:
+          type: string
+          format: date-time
+          nullable: true
+        goodsValue:
+          type: number
+          format: float
+          nullable: true
+        goodsValueCurrency:
+          type: string
+        statisticalNo:
+          type: string
+        unitOfMeasurementCode:
+          type: string
+        unitPrice:
+          type: string
+    transportDelivery:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          nullable: true
+        earliest:
+          type: string
+          format: date-time
+          nullable: true
+        latest:
+          type: string
+          format: date-time
+          nullable: true
+        instructions:
+          type: array
+          items:
+            type: string
+    transportInsurance:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+          nullable: true
+        currency:
+          type: string
+    transportPickup:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        earliest:
+          type: string
+          format: date-time
+          nullable: true
+        latest:
+          type: string
+          format: date-time
+          nullable: true
+        instructions:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+    transportServiceOption:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/transportServiceOptionItem'
+    transportServiceOptionItem:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+    transportSortCode:
+      type: object
+      properties:
+        code:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+          nullable: true
+    transportTermsOfDelivery:
+      type: object
+      properties:
+        combiterm:
+          type: string
+        location:
+          type: string
+        countryCode:
+          type: string
+    transportTransport:
+      type: object
+      properties:
+        instructions:
+          type: array
+          items:
+            type: string
+        cooling:
+          type: boolean
+          nullable: true
+        heating:
+          type: boolean
+          nullable: true
+        frozen:
+          type: boolean
+          nullable: true
+        tempLow:
+          type: integer
+          format: int32
+          nullable: true
+        tempHigh:
+          type: integer
+          format: int32
+          nullable: true
+        subsidyNo:
+          type: string
+        valuebleGoods:
+          type: boolean
+          nullable: true
+        carryIn:
+          type: boolean
+          nullable: true
+        extraCrew:
+          type: boolean
+          nullable: true
+        eurPallets:
+          type: integer
+          format: int32
+          nullable: true
