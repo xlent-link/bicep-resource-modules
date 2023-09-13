@@ -68,7 +68,7 @@ resource hostKeyNamedValues 'Microsoft.ApiManagement/service/namedValues@2022-09
   name: entry.name
   parent: apim
   properties: {
-    displayName: entry.displayName
+    displayName: entry.name
     value: entry.key
     secret: true
   }
