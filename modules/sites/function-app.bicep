@@ -177,7 +177,7 @@ module keyVault 'site-key-vault.bicep' = if (useKeyVault) {
 // APIM BACKEND
 // ----------------------------------------------------------------------------
 
-module apiBackends 'site-apim-backend.bicep' = [for apiName in apimBackends: {
+module apiBackends 'site-apim-backend.bicep' = [for apiName in apimBackends: if (length(apimName) != 0) {
   name: 'api-backend-${name}-${apiName}'
   params: {
     siteName: name
