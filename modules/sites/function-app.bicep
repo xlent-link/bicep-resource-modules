@@ -30,8 +30,8 @@ param healthCheckApplicationInsightsResourceId string = ''
 @description('If health checking is used, this is the action group that is used for alerts')
 param alertActionGroupId string = ''
 
-@description('If using a database, this is the sql server to create the database in')
-param sqlServerName string = ''
+@description('The sql server to maybe create a database in')
+param sqlServerName string
 @description('If using a database, this is the name of the database')
 param sqlDatabaseName string = ''
 param databaseSkuName string = 'Basic'
@@ -104,7 +104,7 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       apiManagementConfig: {
-        id: apim != null ? apim.id : null
+        id: apim.?id
       }
     }
     httpsOnly: true
@@ -191,15 +191,16 @@ module apiBackends 'site-apim-backend.bicep' = [for apiName in apimBackends: if 
 // ----------------------------------------------------------------------------
 // DATABASE
 // ----------------------------------------------------------------------------
-var createDatabase = (sqlServerName != '') ? true : false
+var createDatabase = length(sqlDatabaseName) != 0
+var databaseName = createDatabase ? sqlDatabaseName : 'foobar-placeholder' // Can't have empty name, since bicep won't allow it
 
-resource sqlServer 'Microsoft.Sql/servers@2022-08-01-preview' existing = if (createDatabase) {
+resource sqlServer 'Microsoft.Sql/servers@2022-08-01-preview' existing = {
   name: sqlServerName
 }
 
-resource trackingSql 'Microsoft.Sql/servers/databases@2022-05-01-preview' = if (createDatabase) {
+resource sql 'Microsoft.Sql/servers/databases@2022-05-01-preview' = if (createDatabase) {
   parent: sqlServer
-  name: '${createDatabase ? '' : 'foobar/'}${sqlDatabaseName}'
+  name: databaseName
   location: location
   sku: {
     name: databaseSkuName
