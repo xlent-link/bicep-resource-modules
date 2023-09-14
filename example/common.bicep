@@ -141,11 +141,12 @@ module transportMgmt 'open-api/transport-management/main.bicep' = {
 // ----------------------------------------------------------------------------
 // SQL SERVER
 // ----------------------------------------------------------------------------
+var sqlServerName = '${dashedPrefix}${environment}-sql-server'
 module sqlServer '../modules/sql/sql-server.bicep' = {
   name: '${deployment().name}-sql-server'
   params: {
     location: location
-    name: '${dashedPrefix}${environment}-sql-server'
+    name: sqlServerName
     administratorLoginPassword: guid(environment)
     dbAdminGroupName: adminGroupObjectName
     dbAdminGroupObjectId: adminGroupObjectId
@@ -156,9 +157,9 @@ module sqlServer '../modules/sql/sql-server.bicep' = {
 // OUTPUT
 // • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • •
 
-output apimName string = apim.name
+output apimName string = apiMgmtName
 output functionAppHostKey string = functionAppHostKey
 output applicationInsightsResourceId string = applicationInsights.outputs.applicationInsightsResourceId
 output applicationInsightsInstrumentationKey string = applicationInsights.outputs.applicationInsightsInstrumentationKey
 output alertActionGroupId string = aiMonitor.outputs.alertActionGroupId
-output sqlServerName string = createDatabases ? sqlServer.name : ''
+output sqlServerName string = sqlServerName

@@ -56,6 +56,7 @@ module arcticTern '../modules/sites/function-app.bicep' = {
     storageAccountName: 'atern${environment}${uniqueString(resourceGroup().id)}'
     prefix: prefix
     useKeyVault: true
+    sqlServerName: common.outputs.sqlServerName
     sqlDatabaseName: 'tracking-${environment}'
     apimBackends: [ 'transport-management-api' ]
     apimName: common.outputs.apimName
@@ -63,7 +64,6 @@ module arcticTern '../modules/sites/function-app.bicep' = {
     healthCheckApplicationInsightsResourceId: common.outputs.applicationInsightsResourceId
     applicationInsightsInstrumentationKey: common.outputs.applicationInsightsInstrumentationKey
     alertActionGroupId: common.outputs.alertActionGroupId
-    sqlServerName: common.outputs.sqlServerName
     keyVaultGroupObjectId: keyVaultGroupObjectId
   }
 }
@@ -85,5 +85,6 @@ module lapwing '../modules/sites/function-app.bicep' = {
     applicationInsightsInstrumentationKey: common.outputs.applicationInsightsInstrumentationKey
     alertActionGroupId: common.outputs.alertActionGroupId
     keyVaultGroupObjectId: keyVaultGroupObjectId
+    sqlServerName: common.outputs.sqlServerName
   }
 }
