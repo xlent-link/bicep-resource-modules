@@ -2,7 +2,7 @@
 // COMMON; common resources, not specific to any adapter
 //
 // Note: The service principal for the ADO service connection must be owner
-//       of the Key Vault.
+//       of the key vaults.
 // Note: The service principal for the ADO service connection must be owner
 //       of the file storage storage account
 // ----------------------------------------------------------------------------
