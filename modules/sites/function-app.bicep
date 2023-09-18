@@ -30,8 +30,8 @@ param healthCheckApplicationInsightsResourceId string = ''
 @description('If health checking is used, this is the action group that is used for alerts')
 param alertActionGroupId string = ''
 
-@description('The sql server to maybe create a database in')
-param sqlServerName string
+@description('If using a database, the sql server to maybe create a database in')
+param sqlServerName string = ''
 @description('If using a database, this is the name of the database')
 param sqlDatabaseName string = ''
 param databaseSkuName string = 'Basic'
@@ -191,20 +191,14 @@ module apiBackends 'site-apim-backend.bicep' = [for apiName in apimBackends: if 
 // ----------------------------------------------------------------------------
 // DATABASE
 // ----------------------------------------------------------------------------
-var createDatabase = length(sqlDatabaseName) != 0
-var databaseName = createDatabase ? sqlDatabaseName : 'foobar-placeholder' // Can't have empty name, since bicep won't allow it
-
-resource sqlServer 'Microsoft.Sql/servers@2022-08-01-preview' existing = {
-  name: sqlServerName
-}
-
-resource sql 'Microsoft.Sql/servers/databases@2022-05-01-preview' = if (createDatabase) {
-  parent: sqlServer
-  name: databaseName
-  location: location
-  sku: {
-    name: databaseSkuName
-    tier: databaseSkuTier
+module database '../sql/sql-database.bicep' = if (length(sqlDatabaseName) != 0) {
+  name: '${deployment().name}-database'
+  params: {
+    location: location
+    sqlServerName: sqlServerName
+    databaseName: sqlDatabaseName
+    databaseSkuName: databaseSkuName
+    databaseSkuTier: databaseSkuTier
   }
 }
 
