@@ -48,8 +48,8 @@ resource api 'Microsoft.ApiManagement/service/apis@2022-09-01-preview' = {
 }
 
 // Add to products
-module productsToApi 'api-to-product.bicep' = [for entry in products: {
-  name: entry.productName
+module productsToApi 'api-to-product.bicep' = [for (entry, index) in products: {
+  name: '${deployment().name}-${index}'
   params: {
     apimName: apimName
     productName: entry.productName
