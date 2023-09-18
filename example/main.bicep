@@ -85,6 +85,5 @@ module lapwing '../modules/sites/function-app.bicep' = {
     applicationInsightsInstrumentationKey: common.outputs.applicationInsightsInstrumentationKey
     alertActionGroupId: common.outputs.alertActionGroupId
     keyVaultGroupObjectId: keyVaultGroupObjectId
-    sqlServerName: common.outputs.sqlServerName
   }
 }
