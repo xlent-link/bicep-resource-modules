@@ -48,7 +48,7 @@ param apimName string = ''
 @secure()
 param apimHostKey string = ''
 
-@description('A list of apis that this function app is the backend for')
+@description('A list of apis that this function app is the backend for. List of objects with "apiName" and "path"')
 param apimBackends array = []
 
 // Setup
@@ -177,13 +177,14 @@ module keyVault 'site-key-vault.bicep' = if (useKeyVault) {
 // APIM BACKEND
 // ----------------------------------------------------------------------------
 
-module apiBackends 'site-apim-backend.bicep' = [for apiName in apimBackends: if (length(apimName) != 0) {
-  name: 'api-backend-${name}-${apiName}'
+module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (length(apimName) != 0) {
+  name: 'api-backend-${name}-${entry.apiName}'
   params: {
     siteName: name
     siteAppName: functionAppName
     apimName: apimName
-    apiName: apiName
+    apiName: entry.apiName
+    urlPath: entry.path
     resourceId: functionApp.id
   }
 }]

@@ -58,7 +58,12 @@ module arcticTern '../modules/sites/function-app.bicep' = {
     useKeyVault: true
     sqlServerName: common.outputs.sqlServerName
     sqlDatabaseName: 'tracking-${environment}'
-    apimBackends: [ 'transport-management-api' ]
+    apimBackends: [ 
+      {
+        apiName: 'transport-management-api'
+        path: '/transport-management/v1'
+      }
+    ]
     apimName: common.outputs.apimName
     apimHostKey: common.outputs.functionAppHostKey
     healthCheckApplicationInsightsResourceId: common.outputs.applicationInsightsResourceId
