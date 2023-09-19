@@ -2,6 +2,10 @@
 // MAIN
 //
 // Entry point for deployment
+//
+// Note: Key vaults are created manually, so that we dont need to fuzz with
+// the ADO service connection too much. Also, max 24 characters makes it harder
+// to auto-create name
 // ----------------------------------------------------------------------------
 
 @description('The environment to create/update. Production environment will have higher SKUs.')
@@ -15,9 +19,6 @@ param environment string = 'test'
 param dbAdminGroupName string = 'IntegrationPlatformCoreTeam'
 @description('SQL server access by Group in Azure AD. The object id of the group.')
 param dbAdminGroupObjectId string = '6468c8dd-12a1-42e7-aff4-xxxxx'
-
-@description('Key vault access by Group in Azure AD. The object id of the group.')
-param keyVaultGroupObjectId string = '6468c8dd-12a1-42e7-aff4-xxxxx'
 
 @description('Email address to teams channel that receives alerts')
 param alertEmail string = 'info@example.com'
@@ -55,7 +56,6 @@ module arcticTern '../modules/sites/function-app.bicep' = {
     name: 'arctictern'
     storageAccountName: 'atern${environment}${uniqueString(resourceGroup().id)}'
     prefix: prefix
-    useKeyVault: true
     sqlServerName: common.outputs.sqlServerName
     sqlDatabaseName: 'tracking-${environment}'
     apimBackends: [ 
@@ -69,7 +69,6 @@ module arcticTern '../modules/sites/function-app.bicep' = {
     healthCheckApplicationInsightsResourceId: common.outputs.applicationInsightsResourceId
     applicationInsightsInstrumentationKey: common.outputs.applicationInsightsInstrumentationKey
     alertActionGroupId: common.outputs.alertActionGroupId
-    keyVaultGroupObjectId: keyVaultGroupObjectId
   }
 }
 
@@ -85,10 +84,8 @@ module lapwing '../modules/sites/function-app.bicep' = {
     name: 'lapwing'
     storageAccountName: 'lwing${environment}${uniqueString(resourceGroup().id)}'
     prefix: prefix
-    useKeyVault: true
     healthCheckApplicationInsightsResourceId: common.outputs.applicationInsightsResourceId
     applicationInsightsInstrumentationKey: common.outputs.applicationInsightsInstrumentationKey
     alertActionGroupId: common.outputs.alertActionGroupId
-    keyVaultGroupObjectId: keyVaultGroupObjectId
   }
 }

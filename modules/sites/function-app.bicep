@@ -37,11 +37,6 @@ param sqlDatabaseName string = ''
 param databaseSkuName string = 'Basic'
 param databaseSkuTier string = 'Basic'
 
-@description('Tells if the function app should have its own key vault')
-param useKeyVault bool = true
-@description('When creating a key vault, you can set admin access to this AD group')
-param keyVaultGroupObjectId string = ''
-
 @description('If set, the name of the API Management instance that this function app will be a backend of')
 param apimName string = ''
 @description('If using APIM, the host key used by APIM for accessing the functions')
@@ -156,20 +151,6 @@ module healthChecking 'site-health-checking.bicep' = if (length(healthCheckAppli
     applicationInsightsResourceId: healthCheckApplicationInsightsResourceId
     url: 'https://${functionApp.properties.defaultHostName}/health'
     alertActionGroupId: alertActionGroupId
-  }
-}
-
-// ----------------------------------------------------------------------------
-// KEY VAULT
-// ----------------------------------------------------------------------------
-@description('Add key vault.')
-module keyVault 'site-key-vault.bicep' = if (useKeyVault) {
-  name: '${deployment().name}-key-vault'
-  params: {
-    location: location
-    name: '${dashedPrefix}${environment}-${name}-keyvault'
-    principalId: functionApp.identity.principalId
-    keyVaultGroupObjectId: keyVaultGroupObjectId
   }
 }
 
