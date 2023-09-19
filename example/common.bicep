@@ -142,7 +142,7 @@ module transportMgmt 'open-api/transport-management/main.bicep' = {
 // SQL SERVER
 // ----------------------------------------------------------------------------
 var sqlServerName = '${dashedPrefix}${environment}-sql-server'
-module sqlServer '../modules/sql/sql-server.bicep' = {
+module sqlServer '../modules/sql/sql-server.bicep' = if (createDatabases) {
   name: '${deployment().name}-sql-server'
   params: {
     location: location
