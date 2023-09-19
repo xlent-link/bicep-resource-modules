@@ -5,8 +5,8 @@
 @description('The Azure location. Only specify if not equal to the location of the current resource group.')
 param location string = resourceGroup().location
 
-@description('The name of the resource the key vault is for')
-param siteName string
+@description('The name of the key vault')
+param name string
 
 @description('The managed identity of the resource, e.g. function app ServicePrincipal')
 param principalId string
@@ -18,7 +18,7 @@ param keyVaultGroupObjectId string = ''
 // KEY VAULT
 // ----------------------------------------------------------------------------
 resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
-  name: '${siteName}-keyvault'
+  name: name
   location: location
   properties: {
     sku: {
@@ -37,7 +37,7 @@ var keyVaultSecretsAdminRole = '00482a5a-887f-4fb3-b363-3b7fe8e74483' // Key Vau
 
 // Access for site principal
 resource kvFunctionAppPermissions 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(keyVault.id, siteName, keyVaultSecretsAdminRole)
+  name: guid(keyVault.id, name, keyVaultSecretsAdminRole)
   scope: keyVault
   properties: {
     principalId: principalId

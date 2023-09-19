@@ -167,7 +167,7 @@ module keyVault 'site-key-vault.bicep' = if (useKeyVault) {
   name: '${deployment().name}-key-vault'
   params: {
     location: location
-    siteName: name
+    name: '${dashedPrefix}${environment}-${name}-keyvault'
     principalId: functionApp.identity.principalId
     keyVaultGroupObjectId: keyVaultGroupObjectId
   }
