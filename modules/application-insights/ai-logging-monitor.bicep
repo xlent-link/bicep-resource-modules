@@ -20,6 +20,9 @@ param actionGroupName string = 'Alerts'
 @description('Name of the email receiver entry')
 param emailReceiverName string = 'Teams channel'
 
+@description('The daily quota')
+param dailyQuotaGB int = 5
+
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
 
@@ -44,6 +47,16 @@ resource aiMonitor 'Microsoft.Insights/components@2020-02-02' = {
     Request_Source: 'rest'
     IngestionMode: 'LogAnalytics'
     WorkspaceResourceId: workspace.id
+  }
+}
+
+resource pricingPlan 'microsoft.insights/components/pricingPlans@2017-10-01' = {
+  name: 'current'
+  parent: aiMonitor
+  properties: {
+    cap: dailyQuotaGB
+    warningThreshold: 90
+    planType: 'Basic'
   }
 }
 

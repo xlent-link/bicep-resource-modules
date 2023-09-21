@@ -13,6 +13,9 @@ param environment string
 @description('If set, used to prefix resource names')
 param prefix string = ''
 
+@description('The daily quota')
+param dailyQuotaGB int = 5
+
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
 
@@ -37,6 +40,16 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
     Request_Source: 'rest'
     IngestionMode: 'LogAnalytics'
     WorkspaceResourceId: workspace.id
+  }
+}
+
+resource pricingPlan 'microsoft.insights/components/pricingPlans@2017-10-01' = {
+  name: 'current'
+  parent: applicationInsights
+  properties: {
+    cap: dailyQuotaGB
+    warningThreshold: 90
+    planType: 'Basic'
   }
 }
 
