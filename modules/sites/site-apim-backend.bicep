@@ -56,8 +56,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2022-09-01-preview' existing 
 }
 
 resource backendPolicy 'Microsoft.ApiManagement/service/apis/policies@2022-08-01' = {
-  scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
-
   name: 'policy'
   parent: api
   properties: {
