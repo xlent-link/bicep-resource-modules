@@ -46,6 +46,9 @@ param apimHostKey string = ''
 @description('A list of apis that this function app is the backend for. List of objects with "apiName" and "path"')
 param apimBackends array = []
 
+@description('If the function app is not located in the common resource group, then it is necessary to refer to that group here')
+param commonResourceGroupName string = ''
+
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
 var functionAppPlanName = '${dashedPrefix}${environment}-${name}-app-plan'
@@ -145,6 +148,7 @@ resource default_keyName 'Microsoft.Web/sites/host/functionKeys@2018-11-01' = if
 @description('Add health checking.')
 module healthChecking 'site-health-checking.bicep' = if (length(healthCheckApplicationInsightsResourceId) != 0) {
   name: '${deployment().name}-health-checking'
+  scope: length(commonResourceGroupName) > 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   params: {
     location: location
     name: '${name}-health-check'
@@ -158,7 +162,9 @@ module healthChecking 'site-health-checking.bicep' = if (length(healthCheckAppli
 // APIM BACKEND
 // ----------------------------------------------------------------------------
 
+
 module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (length(apimName) != 0) {
+  scope: length(commonResourceGroupName) > 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   name: 'api-backend-${name}-${entry.apiName}'
   params: {
     siteName: name
