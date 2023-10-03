@@ -20,11 +20,16 @@ param urlPath string
 @description('E.g. the function app id; functionApp.id')
 param resourceId string
 
+
+@description('If the function app is not located in the common resource group, then it is necessary to refer to that group here')
+param commonResourceGroupName string = ''
+
 // ----------------------------------------------------------------------------
 // APIM BACKEND
 // ----------------------------------------------------------------------------
 
 resource apim 'Microsoft.ApiManagement/service@2022-09-01-preview' existing = {
+  scope: length(commonResourceGroupName) > 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   name: apimName
 }
 

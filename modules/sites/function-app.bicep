@@ -148,7 +148,6 @@ resource default_keyName 'Microsoft.Web/sites/host/functionKeys@2018-11-01' = if
 @description('Add health checking.')
 module healthChecking 'site-health-checking.bicep' = if (length(healthCheckApplicationInsightsResourceId) != 0) {
   name: '${deployment().name}-health-checking'
-  scope: length(commonResourceGroupName) > 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   params: {
     location: location
     name: '${name}-health-check'
@@ -164,7 +163,6 @@ module healthChecking 'site-health-checking.bicep' = if (length(healthCheckAppli
 
 
 module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (length(apimName) != 0) {
-  scope: length(commonResourceGroupName) > 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   name: 'api-backend-${name}-${entry.apiName}'
   params: {
     siteName: name
@@ -173,6 +171,7 @@ module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (l
     apiName: entry.apiName
     urlPath: entry.path
     resourceId: functionApp.id
+    commonResourceGroupName: commonResourceGroupName
   }
 }]
 
