@@ -46,8 +46,8 @@ param apimHostKey string = ''
 @description('A list of apis that this function app is the backend for. List of objects with "apiName" and "path"')
 param apimBackends array = []
 
-@description('If the function app is not located in the common resource group, then it is necessary to refer to that group here')
-param commonResourceGroupName string = ''
+@description('If the function app is not located in the common resource group, then it is necessary to refer to that group here. Otherwise set to empty.')
+param commonResourceGroupName string
 
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
