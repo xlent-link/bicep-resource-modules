@@ -86,6 +86,7 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 
 resource apim 'Microsoft.ApiManagement/service@2022-09-01-preview' existing = if (length(apimName) != 0) {
   name: apimName
+  scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
 }
 
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
@@ -162,10 +163,9 @@ module healthChecking 'site-health-checking.bicep' = if (length(healthCheckAppli
 // APIM BACKEND
 // ----------------------------------------------------------------------------
 
-
 module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (length(apimName) != 0) {
   scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
-  name: 'api-backend-${name}-${entry.apiName}'
+  name: '${deployment().name}-${entry.apiName}'
   params: {
     siteName: name
     siteAppName: functionAppName
