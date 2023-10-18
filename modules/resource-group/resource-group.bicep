@@ -46,7 +46,7 @@ module applicationInsights '../application-insights/ai-for-environment.bicep' = 
 // ----------------------------------------------------------------------------
 module aiMonitor '../application-insights/ai-logging-monitor.bicep' = {
   scope: resourceGroup(currentResourceGroup.name)
-  name: '${deployment().name}-monitor-application-insights'
+  name: '${deployment().name}-monitor-ai'
   params: {
     environment: environment
     location: location
