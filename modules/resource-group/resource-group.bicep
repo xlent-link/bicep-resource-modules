@@ -8,13 +8,16 @@
 @description('The Azure location. Needs to be specified since it can be different between resource groups.')
 param location string
 
-param environment string
-
-param prefix string
-
 @description('The name of the component. Use kebab-casing.')
 param name string
 
+@description('If set, application insights modules will be created for the resource group.')
+param environment string = ''
+
+@description('If set, used to prefix resource names')
+param prefix string = ''
+
+@description('Action group email to send alerts to. Can be set to whatever if environment param is not set.')
 param alertEmail string
 
 // Will always be subscription since the value must be a compile-time constant
@@ -31,7 +34,7 @@ resource currentResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
 // APPLICATION INSIGHTS for telemetry
 // ----------------------------------------------------------------------------
 
-module applicationInsights '../application-insights/ai-for-environment.bicep' = {
+module applicationInsights '../application-insights/ai-for-environment.bicep' = if (length(environment) != 0) {
   scope: resourceGroup(currentResourceGroup.name)
   name: '${deployment().name}-application-insights'
   params: {
@@ -44,7 +47,7 @@ module applicationInsights '../application-insights/ai-for-environment.bicep' = 
 // ----------------------------------------------------------------------------
 // APPLICATION INSIGHTS for logging
 // ----------------------------------------------------------------------------
-module aiMonitor '../application-insights/ai-logging-monitor.bicep' = {
+module aiMonitor '../application-insights/ai-logging-monitor.bicep' = if (length(environment) != 0) {
   scope: resourceGroup(currentResourceGroup.name)
   name: '${deployment().name}-monitor-ai'
   params: {
@@ -60,7 +63,7 @@ module aiMonitor '../application-insights/ai-logging-monitor.bicep' = {
 // ----------------------------------------------------------------------------
 // PRE-DEFINED LOG QUERIES
 // ----------------------------------------------------------------------------
-module queryPack '../application-insights/query-pack.bicep' = {
+module queryPack '../application-insights/query-pack.bicep' = if (length(environment) != 0) {
   scope: resourceGroup(currentResourceGroup.name)
   name: '${deployment().name}-query-pack'
   params: {
