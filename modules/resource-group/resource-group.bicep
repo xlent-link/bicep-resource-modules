@@ -86,3 +86,7 @@ module queryPack '../application-insights/query-pack.bicep' = {
 
 output resourceGroupId string = currentResourceGroup.id
 output resourceGroupName string = currentResourceGroup.name
+output applicationInsightsResourceId string = applicationInsights.outputs.applicationInsightsResourceId
+output applicationInsightsInstrumentationKey string = applicationInsights.outputs.applicationInsightsInstrumentationKey
+output alertActionGroupId string = aiMonitor.outputs.alertActionGroupId
+
