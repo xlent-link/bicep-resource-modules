@@ -173,7 +173,6 @@ module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (l
     apiName: entry.apiName
     urlPath: entry.path
     resourceId: functionApp.id
-    commonResourceGroupName: commonResourceGroupName
   }
 }]
 
@@ -190,6 +189,10 @@ module database '../sql/sql-database.bicep' = if (length(sqlDatabaseName) != 0) 
     databaseSkuTier: databaseSkuTier
   }
 }
+
+
+output functionAppName string = functionApp.name
+output functionAppId string = functionApp.id
 
 // Note: If the object id of this System Assigned identity is changed (if removed and added again),
 // we need to drop/create database user
