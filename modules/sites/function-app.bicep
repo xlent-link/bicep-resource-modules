@@ -193,6 +193,7 @@ module database '../sql/sql-database.bicep' = if (length(sqlDatabaseName) != 0) 
 
 output functionAppName string = functionApp.name
 output functionAppId string = functionApp.id
+output functionAppDefaultHostName string = functionApp.properties.defaultHostName
 
 // Note: If the object id of this System Assigned identity is changed (if removed and added again),
 // we need to drop/create database user
