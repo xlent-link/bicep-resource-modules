@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Resources scope subscription
+// function-app-subscription-scope
 //
 // Creates resources need for the function app with health checker
 // This is for when function app and health checker is in different resource groups and the scope is subscription
