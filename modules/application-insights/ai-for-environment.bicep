@@ -27,6 +27,9 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
     sku: {
       name: 'PerGB2018'
     }
+    workspaceCapping: {
+      dailyQuotaGb: dailyQuotaGB
+    }
   }
 }
 
