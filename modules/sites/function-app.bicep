@@ -47,7 +47,7 @@ param apimHostKey string = ''
 param apimBackends array = []
 
 @description('If the function app is not located in the common resource group, then it is necessary to refer to that group here. Otherwise set to empty.')
-param commonResourceGroupName string
+param commonResourceGroupName string = ''
 
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
