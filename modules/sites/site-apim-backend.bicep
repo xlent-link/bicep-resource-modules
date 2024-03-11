@@ -14,7 +14,7 @@ param apimName string
 @description('The name of the API that we are creating a backend for. Must exist already.')
 param apiName string
 
-@description('The path of API, starting with slash (/). Do not include the host.')
+@description('The path of API, starting without slash (/). Do not include the host.')
 param urlPath string
 
 @description('E.g. the function app id; functionApp.id')
@@ -32,7 +32,7 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2022-08-01' = {
   name: '${siteName}-${apiName}'
   parent: apim
   properties: {
-    url: 'https://${siteAppName}.azurewebsites.net${urlPath}'
+    url: 'https://${siteAppName}.azurewebsites.net/${urlPath}'
     resourceId: '${az.environment().resourceManager}${substring(resourceId, 1)}'
     credentials: {
       header: {

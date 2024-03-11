@@ -46,6 +46,9 @@ param apimHostKey string = ''
 @description('A list of apis that this function app is the backend for. List of objects with "apiName" and "path"')
 param apimBackends array = []
 
+@description('If the function app is not located in the common resource group, then it is necessary to refer to that group here. Otherwise set to empty.')
+param commonResourceGroupName string = ''
+
 // Setup
 var dashedPrefix = endsWith(prefix, '-') ? prefix : '${prefix}-'
 var functionAppPlanName = '${dashedPrefix}${environment}-${name}-app-plan'
@@ -83,6 +86,7 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 
 resource apim 'Microsoft.ApiManagement/service@2022-09-01-preview' existing = if (length(apimName) != 0) {
   name: apimName
+  scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
 }
 
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
@@ -145,6 +149,7 @@ resource default_keyName 'Microsoft.Web/sites/host/functionKeys@2018-11-01' = if
 @description('Add health checking.')
 module healthChecking 'site-health-checking.bicep' = if (length(healthCheckApplicationInsightsResourceId) != 0) {
   name: '${deployment().name}-health-checking'
+  scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
   params: {
     location: location
     name: '${name}-health-check'
@@ -159,7 +164,8 @@ module healthChecking 'site-health-checking.bicep' = if (length(healthCheckAppli
 // ----------------------------------------------------------------------------
 
 module apiBackends 'site-apim-backend.bicep' = [for entry in apimBackends: if (length(apimName) != 0) {
-  name: 'api-backend-${name}-${entry.apiName}'
+  scope: length(commonResourceGroupName) != 0 ? resourceGroup(commonResourceGroupName) : resourceGroup()
+  name: '${deployment().name}-${entry.apiName}'
   params: {
     siteName: name
     siteAppName: functionAppName
@@ -183,6 +189,11 @@ module database '../sql/sql-database.bicep' = if (length(sqlDatabaseName) != 0) 
     databaseSkuTier: databaseSkuTier
   }
 }
+
+
+output functionAppName string = functionApp.name
+output functionAppId string = functionApp.id
+output functionAppDefaultHostName string = functionApp.properties.defaultHostName
 
 // Note: If the object id of this System Assigned identity is changed (if removed and added again),
 // we need to drop/create database user
